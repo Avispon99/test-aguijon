@@ -1,6 +1,16 @@
 #!usr/bind/python
 #-*- coding: utf-8 -*-
 
+__autor__ = "Jhonatan Leonardo Zuluaga Torres "
+__copyright__ = "Copyright 2018, Jhonatan Zu"
+__credits__ = "Jhonatan Zu"
+__license__ = "GPL"
+__version__ = "1.0.1"
+__maintainer__ = "Jhonatan Zu"
+__email__ = "jhonatan.zero@gmail.com"
+__status__ = "Developer"
+
+
 import socket, sys, os, re
 
 class Control:
@@ -204,7 +214,11 @@ if __name__ == "__main__":
 	play_bann.traking('9','11')
 
 	#play = Door()    
-	#play.g_door('192.168.1.4', r'C:\Users\Public\Desktop\mumu')   
+	#play.g_door('192.168.1.4', r'C:\Users\Public\Desktop\mumu')
+
+
+
+
 	
 
 
